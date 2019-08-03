@@ -1,0 +1,10 @@
+{
+  "type": "MusicVAE",
+  "dataConverter": {
+    "type": "DrumRollConverter",
+    "args": {
+      "numSteps": 32,
+      "pitchClasses": null
+    }
+  }
+}
