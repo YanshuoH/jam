@@ -1,16 +1,10 @@
 <template>
     <div>
-        <Trios4bar />
+        <ul>
+            <li>
+                <router-link to="/play/trio4bar" tag="a">Trio4bar</router-link>
+            </li>
+
+        </ul>
     </div>
 </template>
-
-<script>
-import Trios4bar from '@/components/playground/Trios4bar.vue'
-
-export default {
-  name: 'playground',
-  components: {
-    Trios4bar
-  }
-}
-</script>

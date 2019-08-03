@@ -1,13 +1,18 @@
 <template>
-    <div id="app">
-        <div class="container">
+    <div id="app"
+         :class="[{'collapsed' : collapsed}]">
+        <div class="app">
+            <div class="container">
 
-            <router-view/>
+                <router-view/>
+            </div>
+
+            <sidebar-menu
+                    :menu="menu"
+                    :collapsed="collapsed"
+                    @collapse="onCollapse"
+            />
         </div>
-
-        <sidebar-menu
-                :menu="menu"
-        />
     </div>
 </template>
 
@@ -25,7 +30,18 @@
         color: #2c3e50;
         margin-top: 60px;
 
+    }
+
+    .app {
         padding: 50px;
+    }
+
+    #app {
+        padding-left: 350px;
+    }
+
+    #app.collapsed {
+        padding-left: 50px;
     }
 
     .container {
@@ -37,6 +53,11 @@
 <script>
   export default {
     name: 'App',
+    methods: {
+      onCollapse: function(collapsed) {
+        this.collapsed = collapsed
+      },
+    },
     data() {
       return {
         menu: [
@@ -62,7 +83,8 @@
               }
             ]
           },
-        ]
+        ],
+        collapsed: false,
       }
     }
   }
