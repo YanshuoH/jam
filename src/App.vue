@@ -69,6 +69,7 @@
           title: c.name,
         })
       }
+
       return {
         menu: [
           {
@@ -83,6 +84,15 @@
             title: 'Playground',
             child: playgroundMenuItems,
           },
+          {
+            title: 'Interpolate',
+            child: [
+              {
+                href: '/interpolate/multitrack-chords',
+                title: 'MultitrackChords',
+              }
+            ]
+          }
         ],
         collapsed: false,
       }

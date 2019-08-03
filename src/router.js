@@ -14,6 +14,11 @@ export default new Router({
       path: '/play/:vaename',
       name: 'item',
       component: () => import(/* webpackChunkName: "playground" */ './views/PlaygroundItem.vue')
+    },
+    {
+      path: '/interpolate/multitrack-chords',
+      name: 'interpolate-multitrack-chords',
+      component: () => import(/* webpackChunkName: "interpolate-multitrack-chords" */ './views/interpolate/MultitrackChords.vue')
     }
   ]
 })

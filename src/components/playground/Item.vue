@@ -41,7 +41,7 @@
       description: String,
     },
     created() {
-      console.log(this.name)
+      console.log('initializing', this.name)
       const model = new MusicVAE(this.endpoint)
 
       model
