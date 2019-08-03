@@ -1,7 +1,7 @@
 <template>
     <div class="align-center">
         <h1>
-            Trio4bar
+            {{ name }}
         </h1>
         <div class="spacer"></div>
         <div v-if="!initialized">
@@ -32,15 +32,21 @@
   import {MusicVAE, Player} from '@magenta/music'
 
   const player = new Player()
-  const model = new MusicVAE('https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/trio_4bar')
 
   export default {
-    name: 'Trios4bar',
+    name: 'PlaygroundItem',
+    props: {
+      name: String,
+      endpoint: String,
+      description: String,
+    },
     created() {
+      console.log(this.name)
+      const model = new MusicVAE(this.endpoint)
+
       model
         .initialize()
         .then(() => {
-          console.log("checkpoint initialized")
           this.initialized = true
         })
         .then(() => model.sample(1))

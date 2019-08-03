@@ -4,7 +4,7 @@
         <div class="app">
             <div class="container">
 
-                <router-view/>
+                <router-view :key="$route.path"/>
             </div>
 
             <sidebar-menu
@@ -51,14 +51,24 @@
 </style>
 
 <script>
+  import {config} from '@/checkpoints/config'
+
   export default {
     name: 'App',
     methods: {
-      onCollapse: function(collapsed) {
+      onCollapse: function (collapsed) {
         this.collapsed = collapsed
       },
     },
     data() {
+      let playgroundMenuItems = []
+      for (let i=0;i<config.length;i++) {
+        let c = config[i]
+        playgroundMenuItems.push({
+          href: `/play/${c.name}`,
+          title: c.name,
+        })
+      }
       return {
         menu: [
           {
@@ -71,17 +81,7 @@
           },
           {
             title: 'Playground',
-            href: '/play',
-            child: [
-              {
-                href: '/play/trio4bar',
-                title: 'Trio4Bar',
-              },
-              {
-                href: '/play/trio4bar',
-                title: 'Trio4Bar',
-              }
-            ]
+            child: playgroundMenuItems,
           },
         ],
         collapsed: false,
