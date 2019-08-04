@@ -93,6 +93,7 @@
   
   function generateSample() {
     const z = tf.randomNormal([1, Z_DIM])
+    console.log(z)
     let zarr = z.dataSync()
     z.dispose()
 

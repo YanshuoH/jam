@@ -24,6 +24,11 @@ export default new Router({
       path: '/interpolate/sample-with-chords',
       name: 'interpolate-sample-with-chords',
       component: () => import(/* webpackChunkName: "interpolate-multitrack-chords" */ './views/interpolate/SampleWithChords.vue')
-    }
+    },
+    {
+      path: '/interpolate/learn-style',
+      name: 'interpolate-learn-styke',
+      component: () => import(/* webpackChunkName: "interpolate-multitrack-chords" */ './views/interpolate/LearnStyle.vue')
+    },
   ]
 })

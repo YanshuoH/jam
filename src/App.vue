@@ -94,7 +94,11 @@
               {
                 href: '/interpolate/sample-with-chords',
                 title: 'SampleWithChords',
-              }
+              },
+              {
+                href: '/interpolate/learn-style',
+                title: 'LearnStyle',
+              },
             ]
           }
         ],
