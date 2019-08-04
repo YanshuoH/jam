@@ -19,6 +19,11 @@ export default new Router({
       path: '/interpolate/multitrack-chords',
       name: 'interpolate-multitrack-chords',
       component: () => import(/* webpackChunkName: "interpolate-multitrack-chords" */ './views/interpolate/MultitrackChords.vue')
+    },
+    {
+      path: '/interpolate/sample-with-chords',
+      name: 'interpolate-sample-with-chords',
+      component: () => import(/* webpackChunkName: "interpolate-multitrack-chords" */ './views/interpolate/SampleWithChords.vue')
     }
   ]
 })

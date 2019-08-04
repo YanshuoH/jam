@@ -90,6 +90,10 @@
               {
                 href: '/interpolate/multitrack-chords',
                 title: 'MultitrackChords',
+              },
+              {
+                href: '/interpolate/sample-with-chords',
+                title: 'SampleWithChords',
               }
             ]
           }

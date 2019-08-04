@@ -1,10 +1,9 @@
 <template>
     <div class="align-center">
-        <h1>
-            {{ name }}
-        </h1>
+        <h1>Sample With Chords</h1>
+
         <div>
-            {{ description }}
+            Chord progress without interpolation
         </div>
         <div class="spacer"></div>
         <div v-if="!initialized">
@@ -24,37 +23,47 @@
 
 <style>
     .align-center {
-        text-align: center;
+        text-align: center
     }
+
     .spacer {
-        padding: 30px;
+        padding: 30px
     }
 </style>
 
 <script>
-  import {MusicVAE, Player} from '@magenta/music'
+  import {MusicVAE, Player, sequences} from '@magenta/music'
+  import {search} from '@/checkpoints/config'
+  import {concatenateSequences} from '@/tools/sequences'
 
   const player = new Player()
 
-  export default {
-    name: 'PlaygroundItem',
-    props: {
-      name: String,
-      endpoint: String,
-      description: String,
-    },
-    created() {
-      console.log('initializing', this.name)
-      const model = new MusicVAE(this.endpoint)
+  const chordProgression = ['F', 'G', 'Am', 'Am']
+  const endpoint = search('multitrack_chords').endpoint
+  const model = new MusicVAE(endpoint)
 
-      model
-        .initialize()
+  export default {
+    name: 'SampleWithChords',
+    created() {
+      model.initialize()
         .then(() => {
           this.initialized = true
         })
-        .then(() => model.sample(1))
+        .then(() => {
+          let promises = []
+          for (let i = 0; i < chordProgression.length; i++) {
+            let chord = chordProgression[i]
+            let p = model.sample(1, null, [chord], 24, 120)
+              .then(samples => samples[0])
+            promises.push(p)
+          }
+
+          return Promise.all(promises)
+        })
         .then(samples => {
-          this.sample = samples[0]
+          let concatSeqs = concatenateSequences(samples)
+          // let qs = sequences.quantizeNoteSequence(concatSeqs, null)
+          this.sample = sequences.mergeInstruments(concatSeqs)
         })
     },
     methods: {

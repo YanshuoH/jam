@@ -2,6 +2,10 @@
     <div class="align-center">
         <h1>Interpolate Multitrack Chords</h1>
 
+        <div>
+            Chord progress with interpolation
+        </div>
+        <div class="spacer"></div>
         <div v-if="!initialized">
             <div class="fa-5x">
                 <i class="fas fa-sync fa-spin"></i>
@@ -30,6 +34,7 @@
 <script>
   import {MusicVAE, Player, SoundFontPlayer, tf, sequences} from '@magenta/music'
   import {search} from '@/checkpoints/config'
+  import {concatenateSequences} from '@/tools/sequences'
 
   const Z_DIM = 256
   const STEPS_PER_QUARTER = 24
@@ -142,7 +147,6 @@
     const z2Tensor = tf.tensor2d(z2, [1, Z_DIM])
     const zInterp = slerp(z1Tensor, z2Tensor, numSteps)
 
-    console.log(z1, z2, model, chord)
     return model.decode(zInterp, undefined, [chord], STEPS_PER_QUARTER)
     // .then(sequences => doneCallback(sequences))
   }
@@ -159,23 +163,6 @@
     const alpha1 = tf.div(tf.sin(tf.mul(t1, omega)), sinOmega).as2D(n, 1)
     const alpha2 = tf.div(tf.sin(tf.mul(t2, omega)), sinOmega).as2D(n, 1)
     return tf.add(tf.mul(alpha1, z1), tf.mul(alpha2, z2))
-  }
-
-  // Concatenate multiple NoteSequence objects.
-  function concatenateSequences(seqs) {
-    const seq = sequences.clone(seqs[0])
-    let numSteps = seqs[0].totalQuantizedSteps
-    for (let i = 1; i < seqs.length; i++) {
-      const s = sequences.clone(seqs[i])
-      s.notes.forEach(note => {
-        note.quantizedStartStep += numSteps
-        note.quantizedEndStep += numSteps
-        seq.notes.push(note)
-      })
-      numSteps += s.totalQuantizedSteps
-    }
-    seq.totalQuantizedSteps = numSteps
-    return seq
   }
 
   // Randomly adjust note times.
