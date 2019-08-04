@@ -1,10 +1,11 @@
 import {midiToSequenceProto, sequences} from '@magenta/music'
+import {NoteSequence} from "@magenta/music/es5/protobuf/index";
 
 const STEPS_PER_QUARTER = 24
 
 /**
  * @param filename
- * @returns {Promise<any>}
+ * @returns {Promise<INoteSequence>}
  */
 export function readMidiFileToBinaryString(filename) {
   return new Promise((resolve, reject) => {

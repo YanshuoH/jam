@@ -35,5 +35,10 @@ export default new Router({
       name: 'interpolate-learn-style-with-chord',
       component: () => import(/* webpackChunkName: "interpolate-learn-style-with-chord" */ './views/interpolate/LearnStyleWithChord.vue')
     },
+    {
+      path: '/demo/sweet-child-o-mine',
+      name: 'demo-sweet-child-o-mine',
+      component: () => import(/* webpackChunkName: "interpolate-learn-style-with-chord" */ './views/demo/SweetChildOMine.vue')
+    }
   ]
 })

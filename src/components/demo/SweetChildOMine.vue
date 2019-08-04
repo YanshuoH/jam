@@ -1,9 +1,9 @@
 <template>
     <div class="align-center">
-        <h1>Learn Style With Chord</h1>
+        <h1>Sweet Child O' ...</h1>
 
         <div>
-            Learn style from midi file with defined chord
+            Make a Guns'n'Roses like music clip
         </div>
         <div class="spacer"></div>
 
@@ -14,7 +14,7 @@
         </div>
 
         <div v-if="modelInitialized">
-            <div class="upload">
+            <div class="upload" v-if="!sequenceInitializing">
                 <label>File
                     <input type="file" id="file" ref="file" v-on:change="upload()" accept="audio/midi"/>
                 </label>
@@ -52,71 +52,45 @@
   import {MusicVAE, tf, sequences} from '@magenta/music'
   import {readMidiFileToBinaryString} from '@/tools/load_midi'
   import {concatenateSequences} from '@/tools/sequences'
+  import {interpolateSequences} from '@/tools/interpolate'
+  import {search} from "@/checkpoints/config";
   import {createSoundFontPlayer, humanize} from '@/tools/player'
-  import {slerp} from "@/tools/slerp"
-  import {search} from "@/checkpoints/config"
+  import {slerp} from '@/tools/slerp'
 
   const STEPS_PER_QUARTER = 24
-  const Z_DIM = 256
 
   const player = createSoundFontPlayer()
-  const endpoint = search('multitrack_chords').endpoint
+  const endpoint = search('multitrack_fb256').endpoint
   const model = new MusicVAE(endpoint)
 
   export default {
-    name: 'LearnStyle',
+    name: 'SweetChildOMine',
     created() {
       console.log('initializing model')
       model.initialize()
         .then(() => {
-          console.log('initialized model')
           this.modelInitialized = true
         })
     },
     methods: {
       upload() {
-        if (this.playing) {
-          this.stop()
-        }
-
         let file = this.$refs.file.files[0]
-
-        // avoid memory leak
-        let tfr2;
         this.sequenceInitializing = true
         readMidiFileToBinaryString(file)
-          .then(seqs => {
+          .then(seq => {
             this.file = file
-            return model.encode([seqs], ['Dm'])
-          })
-          .then(z => {
-            console.log(z)
-            tfr2 = z
-            return z.data()
-          })
-          .then(zarr => {
-            tfr2.dispose()
+            // let click = Number((seq.totalQuantizedSteps / STEPS_PER_QUARTER).toFixed(0))
+            // let bars = Number((click/4).toFixed(0))
 
-            // zarr = tf.reshape(zarr, [1, Z_DIM]).dataSync()
-            const zt1 = tf.tensor2d(zarr, [1, Z_DIM])
+            let seqs = sequences.split(sequences.clone(seq), STEPS_PER_QUARTER*4)
+            console.log(seqs.length)
 
-            const zrandom = tf.randomNormal([1, Z_DIM])
-            let zarrRandom = zrandom.dataSync()
-            zrandom.dispose()
 
-            const zt2 = tf.tensor2d(zarrRandom, [1, Z_DIM])
-            const zt = slerp(zt1, zt2, 6)
-
-            return model.decode(zt, undefined, ['C'], STEPS_PER_QUARTER)
+            return interpolateSequences(model, seqs, undefined)
           })
           .then(seqs => {
-            const seq = concatenateSequences(seqs)
-            const mergedSeq = sequences.mergeInstruments(seq)
-            let interpSeq = sequences.unquantizeSequence(mergedSeq)
-            interpSeq.ticksPerQuarter = STEPS_PER_QUARTER
-
-            this.sample = interpSeq
-            return player.loadSamples(this.sample)
+            this.sample = seqs
+            return player.loadSamples(seqs)
           })
           .then(() => {
             this.sequenceInitializing = false
@@ -124,7 +98,6 @@
           .catch(err => {
             alert(err)
             console.trace(err)
-
             this.sequenceInitializing = false
           })
       },

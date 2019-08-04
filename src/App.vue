@@ -81,6 +81,15 @@
             title: "Home",
           },
           {
+            title: 'Demo',
+            child: [
+              {
+                href: '/demo/sweet-child-o-mine',
+                title: 'SweetChildOMine',
+              }
+            ]
+          },
+          {
             title: 'Playground',
             child: playgroundMenuItems,
           },

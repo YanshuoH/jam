@@ -1,9 +1,9 @@
 <template>
     <div class="align-center">
-        <h1>Learn Style</h1>
+        <h1>Style Transition</h1>
 
         <div>
-            Learn style from midi file
+            Style transition between samples
         </div>
         <div class="spacer"></div>
 
@@ -99,7 +99,7 @@
                 zrandom.dispose()
 
                 const zt2 = tf.tensor2d(zarrRandom, [1, Z_DIM])
-                const zt = slerp(zt1, zt2, 4)
+                const zt = slerp(zt1, zt2, 3)
                 return model.decode(zt, undefined, undefined, STEPS_PER_QUARTER)
               })
           })
