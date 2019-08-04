@@ -96,8 +96,12 @@
                 title: 'SampleWithChords',
               },
               {
-                href: '/interpolate/learn-style',
-                title: 'LearnStyle',
+                href: '/interpolate/style-transition',
+                title: 'StyleTransition',
+              },
+              {
+                href: '/interpolate/learn-style-with-chord',
+                title: 'LearnStyleWithChord',
               },
             ]
           }

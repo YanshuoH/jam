@@ -23,12 +23,17 @@ export default new Router({
     {
       path: '/interpolate/sample-with-chords',
       name: 'interpolate-sample-with-chords',
-      component: () => import(/* webpackChunkName: "interpolate-multitrack-chords" */ './views/interpolate/SampleWithChords.vue')
+      component: () => import(/* webpackChunkName: "interpolate-sample-with-chords" */ './views/interpolate/SampleWithChords.vue')
     },
     {
-      path: '/interpolate/learn-style',
-      name: 'interpolate-learn-styke',
-      component: () => import(/* webpackChunkName: "interpolate-multitrack-chords" */ './views/interpolate/LearnStyle.vue')
+      path: '/interpolate/style-transition',
+      name: 'interpolate-style-transition',
+      component: () => import(/* webpackChunkName: "interpolate-learn-style" */ './views/interpolate/StyleTransition.vue')
+    },
+    {
+      path: '/interpolate/learn-style-with-chord',
+      name: 'interpolate-learn-style-with-chord',
+      component: () => import(/* webpackChunkName: "interpolate-learn-style-with-chord" */ './views/interpolate/LearnStyleWithChord.vue')
     },
   ]
 })

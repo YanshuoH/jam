@@ -1,9 +1,9 @@
 <template>
     <div class="align-center">
-        <h1>Learn Style</h1>
+        <h1>Learn Style With Chord</h1>
 
         <div>
-            Learn style from midi file
+            Learn style from midi file with defined chord
         </div>
         <div class="spacer"></div>
 
@@ -56,10 +56,11 @@
   import {slerp} from "@/tools/slerp";
   import {search} from "@/checkpoints/config";
 
+  const STEPS_PER_QUARTER = 24
   const Z_DIM = 256
 
   const player = createSoundFontPlayer()
-  const endpoint = search('multitrack_fb256').endpoint
+  const endpoint = search('multitrack_chords').endpoint
   const model = new MusicVAE(endpoint)
 
   export default {
@@ -80,33 +81,41 @@
 
         let file = this.$refs.file.files[0]
 
+        // avoid memory leak
+        let tfr2;
         this.sequenceInitializing = true
         readMidiFileToBinaryString(file)
           .then(seqs => {
             this.file = file
-            return model.encode([seqs], undefined)
+            return model.encode([seqs], ['Dm'])
           })
           .then(z => {
+            console.log(z)
+            tfr2 = z
             return z.data()
-              .then(zarr => {
-                z.dispose()
+          })
+          .then(zarr => {
+            tfr2.dispose()
 
-                const zt1 = tf.tensor2d(zarr, [1, Z_DIM])
+            // zarr = tf.reshape(zarr, [1, Z_DIM]).dataSync()
+            const zt1 = tf.tensor2d(zarr, [1, Z_DIM])
 
-                const zrandom = tf.randomNormal([1, Z_DIM])
-                let zarrRandom = zrandom.dataSync()
-                zrandom.dispose()
+            const zrandom = tf.randomNormal([1, Z_DIM])
+            let zarrRandom = zrandom.dataSync()
+            zrandom.dispose()
 
-                const zt2 = tf.tensor2d(zarrRandom, [1, Z_DIM])
-                const zt = slerp(zt1, zt2, 1)
-                return model.decode(zt, undefined, undefined, 24)
-              })
+            const zt2 = tf.tensor2d(zarrRandom, [1, Z_DIM])
+            const zt = slerp(zt1, zt2, 6)
+
+            return model.decode(zt, undefined, ['C'], STEPS_PER_QUARTER)
           })
           .then(seqs => {
             const seq = concatenateSequences(seqs)
             const mergedSeq = sequences.mergeInstruments(seq)
+            let interpSeq = sequences.unquantizeSequence(mergedSeq)
+            interpSeq.ticksPerQuarter = STEPS_PER_QUARTER
 
-            this.sample = mergedSeq
+            this.sample = interpSeq
             return player.loadSamples(this.sample)
           })
           .then(() => {
