@@ -18,7 +18,7 @@ export function humanize(s) {
   return seq
 }
 
-export function createSoundFontPlayer() {
+export function createSoundFontPlayer(cb) {
   const MAX_PAN = 0.2
   const MIN_DRUM = 35
   const MAX_DRUM = 81
@@ -56,5 +56,5 @@ export function createSoundFontPlayer() {
   // Set up SoundFont player.
   return new SoundFontPlayer(
     'https://storage.googleapis.com/download.magenta.tensorflow.org/soundfonts_js/sgm_plus',
-    globalCompressor, programMap, drumMap)
+    globalCompressor, programMap, drumMap, cb)
 }

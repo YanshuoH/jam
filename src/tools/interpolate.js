@@ -15,10 +15,10 @@ const NUM_STEP = 1
 export async function interpolateSequences(model, seqs, chord) {
   let tensors = []
 
-  seqs = seqs.slice(8, 16)
   for (let i = 0; i < seqs.length; i++) {
     const seq = seqs[i]
 
+    console.log(`encoding tensor %d/%d`, i + 1, seqs.length)
     const z = await model.encode([seq], undefined)
     const zarr = await z.data()
     z.dispose()
@@ -27,25 +27,57 @@ export async function interpolateSequences(model, seqs, chord) {
     tensors.push({zt, i})
   }
 
-  console.log(tensors)
-  // 先试着搞 1->3, 2->4
+  let resultSeqs = []
+  // 1 -> 2, 2 -> 3, 3 -> 4, 4 -> 5 ...
   const t1 = tensors[0].zt
   const t2 = tensors[1].zt
   const t3 = tensors[2].zt
   const t4 = tensors[3].zt
+  const t5 = tensors[4].zt
 
-  const t1Tot3 = slerp(t1, t4, 2)
-  const t2Tot4 = slerp(t2, t4, 2)
+  const inter1 = slerp(t1, t2, 1)
+  const inter2 = slerp(t2, t3, 1)
+  const inter3 = slerp(t3, t4, 1)
+  const inter4 = slerp(t4, t5, 1)
+  //
+  let ss1 = await model.decode(inter1, undefined, undefined, STEPS_PER_QUARTER)
+  let ss2 = await model.decode(inter2, undefined, undefined, STEPS_PER_QUARTER)
+  let ss3 = await model.decode(inter3, undefined, undefined, STEPS_PER_QUARTER)
+  let ss4 = await model.decode(inter4, undefined, undefined, STEPS_PER_QUARTER)
 
-  const t1Tot3Seq = await model.decode(t1Tot3, undefined, undefined, STEPS_PER_QUARTER)
-  const t2Tot4Seq = await model.decode(t2Tot4, undefined, undefined, STEPS_PER_QUARTER)
+  resultSeqs.push(...ss1)
+  resultSeqs.push(...ss2)
+  resultSeqs.push(...ss3)
+  resultSeqs.push(...ss4)
+  // // 1 -> 3, 2 -> 4, then flush
+  // for (let i = 0; i < tensors.length; i++) {
+  //   if (i === length - 3) {
+  //     break
+  //   }
+  //   const t1 = tensors[i].zt
+  //   const t2 = tensors[i + 2].zt
+  //
+  //   const inter = slerp(t1, t2, 2)
+  //   const reconstruct = await model.decode(inter, undefined, undefined, STEPS_PER_QUARTER)
+  //   resultSeqs.push({
+  //     seq: reconstruct[0],
+  //     i: i,
+  //   }, {
+  //     seq: reconstruct[1],
+  //     i: i + 2
+  //   })
+  // }
 
-  // console.log(t1Tot3Seq)
+  // sort
+  // resultSeqs.sort((a, b) => {
+  //   return a.i - b.i
+  // })
+  // let ss = []
+  // for (let i=0;i<resultSeqs.length;i++) {
+  //   ss.push(resultSeqs[i].seq)
+  // }
 
-  let result = [...t1Tot3Seq, ...t2Tot4Seq]
-  // let result = [...t1Tot3Seq]
-
-  const seq = concatenateSequences(result)
+  const seq = concatenateSequences(resultSeqs)
   const mergedSeq = sequences.mergeInstruments(seq)
   let interpSeq = sequences.unquantizeSequence(mergedSeq)
   interpSeq.ticksPerQuarter = STEPS_PER_QUARTER
